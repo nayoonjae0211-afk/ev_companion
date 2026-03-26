@@ -41,49 +41,69 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 32),
 
-              _Section(children: [
-                _SettingsTile(
-                  icon: Icons.language,
-                  title: s.language,
-                  subtitle: s.languageValue,
-                  trailing: GestureDetector(
-                    onTap: localeNotifier.toggle,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF4D73B2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        s.switchLanguage,
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
+              _Section(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.language,
+                    title: s.language,
+                    subtitle: s.languageValue,
+                    trailing: GestureDetector(
+                      onTap: localeNotifier.toggle,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4D73B2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          s.switchLanguage,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ]),
+                ],
+              ),
 
               const SizedBox(height: 16),
 
-              _Section(children: [
-                _SettingsTile(
-                  icon: Icons.cloud_outlined,
-                  title: s.dataSource,
-                  subtitle: 'OpenWeatherMap API',
-                ),
-                Divider(color: Colors.white.withValues(alpha: 0.1), height: 1, indent: 16, endIndent: 16),
-                _SettingsTile(
-                  icon: Icons.info_outline,
-                  title: s.aboutApp,
-                  subtitle: s.aboutDesc,
-                ),
-                Divider(color: Colors.white.withValues(alpha: 0.1), height: 1, indent: 16, endIndent: 16),
-                _SettingsTile(
-                  icon: Icons.tag,
-                  title: s.appVersion,
-                  subtitle: '1.0.0',
-                ),
-              ]),
+              _Section(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.cloud_outlined,
+                    title: s.dataSource,
+                    subtitle: 'OpenWeatherMap API',
+                  ),
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+                  _SettingsTile(
+                    icon: Icons.info_outline,
+                    title: s.aboutApp,
+                    subtitle: s.aboutDesc,
+                  ),
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.1),
+                    height: 1,
+                    indent: 16,
+                    endIndent: 16,
+                  ),
+                  _SettingsTile(
+                    icon: Icons.tag,
+                    title: s.appVersion,
+                    subtitle: '1.0.0',
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -125,8 +145,14 @@ class _SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFF4DC0FF), size: 22),
-      title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 15)),
-      subtitle: Text(subtitle, style: const TextStyle(color: _textSub, fontSize: 13)),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white, fontSize: 15),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: const TextStyle(color: _textSub, fontSize: 13),
+      ),
       trailing: trailing,
     );
   }

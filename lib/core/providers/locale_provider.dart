@@ -6,7 +6,9 @@ class LocaleNotifier extends Notifier<Locale> {
   Locale build() => const Locale('ko');
 
   void toggle() {
-    state = state.languageCode == 'ko' ? const Locale('en') : const Locale('ko');
+    state = state.languageCode == 'ko'
+        ? const Locale('en')
+        : const Locale('ko');
   }
 }
 

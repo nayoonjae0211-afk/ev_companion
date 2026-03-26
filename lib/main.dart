@@ -9,10 +9,12 @@ import 'l10n/app_strings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ),
+  );
   runApp(const ProviderScope(child: WeatherApp()));
 }
 
@@ -54,11 +56,7 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell> {
   int _selectedIndex = 0;
 
-  static const _screens = [
-    HomeScreen(),
-    CityScreen(),
-    SettingsScreen(),
-  ];
+  static const _screens = [HomeScreen(), CityScreen(), SettingsScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -79,8 +77,14 @@ class _MainShellState extends ConsumerState<MainShell> {
             label: s.home,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.location_city_outlined, color: Color(0xFFCCDEFF)),
-            selectedIcon: const Icon(Icons.location_city, color: Color(0xFF4DC0FF)),
+            icon: const Icon(
+              Icons.location_city_outlined,
+              color: Color(0xFFCCDEFF),
+            ),
+            selectedIcon: const Icon(
+              Icons.location_city,
+              color: Color(0xFF4DC0FF),
+            ),
             label: s.cityTab,
           ),
           NavigationDestination(

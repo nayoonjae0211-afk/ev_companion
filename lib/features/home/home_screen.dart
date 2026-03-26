@@ -49,12 +49,19 @@ class HomeScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.white54),
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Colors.white54,
+                ),
                 const SizedBox(height: 8),
                 Text('$e', style: const TextStyle(color: Colors.white70)),
                 TextButton(
                   onPressed: () => ref.read(weatherProvider.notifier).refresh(),
-                  child: Text(s.refresh, style: const TextStyle(color: Colors.white)),
+                  child: Text(
+                    s.refresh,
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -211,9 +218,7 @@ class _BlossomBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isBlooming
-            ? const Color(0x99FF6B9D)
-            : const Color(0x553355AA),
+        color: isBlooming ? const Color(0x99FF6B9D) : const Color(0x553355AA),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isBlooming ? const Color(0xFFFF6B9D) : Colors.transparent,
@@ -222,10 +227,7 @@ class _BlossomBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
-            '🌸',
-            style: TextStyle(fontSize: isBlooming ? 28 : 22),
-          ),
+          Text('🌸', style: TextStyle(fontSize: isBlooming ? 28 : 22)),
           const SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,11 +292,11 @@ class _HourlyCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _hourly.map((d) => _HourlySlot(
-              time: d.time,
-              icon: d.icon,
-              temp: d.temp,
-            )).toList(),
+            children: _hourly
+                .map(
+                  (d) => _HourlySlot(time: d.time, icon: d.icon, temp: d.temp),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -304,7 +306,11 @@ class _HourlyCard extends StatelessWidget {
 
 class _HourlySlot extends StatelessWidget {
   final String time, icon, temp;
-  const _HourlySlot({required this.time, required this.icon, required this.temp});
+  const _HourlySlot({
+    required this.time,
+    required this.icon,
+    required this.temp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -314,7 +320,14 @@ class _HourlySlot extends StatelessWidget {
         const SizedBox(height: 6),
         Text(icon, style: const TextStyle(fontSize: 24)),
         const SizedBox(height: 6),
-        Text(temp, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(
+          temp,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }
@@ -364,9 +377,18 @@ class _WeeklyCard extends StatelessWidget {
             final d = e.value;
             return Column(
               children: [
-                _WeekRow(day: d.day, icon: d.icon, low: d.low, high: d.high, pct: d.pct),
+                _WeekRow(
+                  day: d.day,
+                  icon: d.icon,
+                  low: d.low,
+                  high: d.high,
+                  pct: d.pct,
+                ),
                 if (i < _weekData.length - 1)
-                  Divider(color: Colors.white.withValues(alpha: 0.08), height: 1),
+                  Divider(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    height: 1,
+                  ),
               ],
             );
           }),
@@ -397,7 +419,11 @@ class _WeekRow extends StatelessWidget {
             width: 72,
             child: Text(
               day,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           Text(icon, style: const TextStyle(fontSize: 20)),
@@ -431,7 +457,11 @@ class _WeekRow extends StatelessWidget {
             child: Text(
               high,
               textAlign: TextAlign.right,
-              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -451,8 +481,18 @@ class _DetailGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      (icon: '💧', label: strings.humidity, value: '${weather.humidity}%', sub: '이슬점: 11°'),
-      (icon: '💨', label: strings.wind, value: weather.windSpeed.toStringAsFixed(0), sub: 'km/h  서풍'),
+      (
+        icon: '💧',
+        label: strings.humidity,
+        value: '${weather.humidity}%',
+        sub: '이슬점: 11°',
+      ),
+      (
+        icon: '💨',
+        label: strings.wind,
+        value: weather.windSpeed.toStringAsFixed(0),
+        sub: 'km/h  서풍',
+      ),
       (icon: '🌞', label: '자외선 지수', value: '3', sub: '보통'),
       (icon: '👁', label: '가시거리', value: '10', sub: 'km  맑음'),
     ];
@@ -464,12 +504,16 @@ class _DetailGrid extends StatelessWidget {
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
       childAspectRatio: 2.2,
-      children: items.map((d) => _DetailTile(
-        icon: d.icon,
-        label: d.label,
-        value: d.value,
-        sub: d.sub,
-      )).toList(),
+      children: items
+          .map(
+            (d) => _DetailTile(
+              icon: d.icon,
+              label: d.label,
+              value: d.value,
+              sub: d.sub,
+            ),
+          )
+          .toList(),
     );
   }
 }
@@ -497,11 +541,20 @@ class _DetailTile extends StatelessWidget {
         children: [
           Text(
             '$icon $label',
-            style: const TextStyle(color: _textSub, fontSize: 11, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              color: _textSub,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, height: 1),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              height: 1,
+            ),
           ),
           Text(sub, style: const TextStyle(color: _textSub, fontSize: 12)),
         ],

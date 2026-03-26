@@ -8,7 +8,9 @@ const _apiKey = 'YOUR_API_KEY';
 const _baseUrl = 'https://api.openweathermap.org/data/2.5';
 
 // ── 선택된 도시 ──────────────────────────────────────────
-final selectedCityProvider = NotifierProvider<_CityNotifier, String>(_CityNotifier.new);
+final selectedCityProvider = NotifierProvider<_CityNotifier, String>(
+  _CityNotifier.new,
+);
 
 class _CityNotifier extends Notifier<String> {
   @override
@@ -38,9 +40,7 @@ class WeatherNotifier extends AsyncNotifier<WeatherData> {
       return _mockWeather(city);
     }
 
-    final uri = Uri.parse(
-      '$_baseUrl/weather?q=$city&lang=kr&appid=$_apiKey',
-    );
+    final uri = Uri.parse('$_baseUrl/weather?q=$city&lang=kr&appid=$_apiKey');
     final response = await http.get(uri);
 
     if (response.statusCode == 200) {

@@ -58,7 +58,7 @@ class ForecastDay {
 /// 벚꽃 개화 예측 모델
 class BlossomForecast {
   final String cityName;
-  final DateTime? predictedDate;   // null이면 이미 지났거나 아직 계절 아님
+  final DateTime? predictedDate; // null이면 이미 지났거나 아직 계절 아님
   final BlossomStatus status;
   final String message;
 
@@ -71,8 +71,8 @@ class BlossomForecast {
 }
 
 enum BlossomStatus {
-  blooming,   // 현재 개화 중
-  upcoming,   // 곧 개화 예정
-  passed,     // 이미 지남
-  tooEarly,   // 아직 시즌 아님
+  blooming, // 현재 개화 중
+  upcoming, // 곧 개화 예정
+  passed, // 이미 지남
+  tooEarly, // 아직 시즌 아님
 }

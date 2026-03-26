@@ -127,9 +127,7 @@ class _CityCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF4D73B2)
-              : _cardBg,
+          color: isSelected ? const Color(0xFF4D73B2) : _cardBg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? const Color(0xFF4DC0FF) : Colors.transparent,
