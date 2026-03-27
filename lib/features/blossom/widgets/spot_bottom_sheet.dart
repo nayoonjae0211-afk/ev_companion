@@ -28,7 +28,7 @@ class SpotBottomSheet extends ConsumerWidget {
       maxChildSize: 0.92,
       builder: (_, controller) => Container(
         decoration: const BoxDecoration(
-          color: Color(0xFFFFF0F5),
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(

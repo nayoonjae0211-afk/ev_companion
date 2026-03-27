@@ -13,13 +13,7 @@ class BlossomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFFFE4F0), Color(0xFFFFF0F8)],
-        ),
-      ),
+      color: Colors.white,
       child: SafeArea(
         child: CustomScrollView(
           slivers: [
