@@ -55,13 +55,19 @@ class TouristSpot {
   }
 }
 
-// 2025 벚꽃 개화 데이터 (웨더아이 기준)
+// 2026 벚꽃 개화 데이터 (웨더아이 기준)
 final List<BlossomCity> blossomCities = [
   BlossomCity(
     name: '제주',
     bloomDate: DateTime(2026, 3, 22),
     peakDate: DateTime(2026, 3, 29),
     areaCode: '39',
+  ),
+  BlossomCity(
+    name: '통영',
+    bloomDate: DateTime(2026, 3, 24),
+    peakDate: DateTime(2026, 3, 31),
+    areaCode: '36',
   ),
   BlossomCity(
     name: '부산',
@@ -82,10 +88,22 @@ final List<BlossomCity> blossomCities = [
     areaCode: '35',
   ),
   BlossomCity(
+    name: '경주',
+    bloomDate: DateTime(2026, 3, 25),
+    peakDate: DateTime(2026, 4, 1),
+    areaCode: '35',
+  ),
+  BlossomCity(
     name: '울산',
     bloomDate: DateTime(2026, 3, 25),
     peakDate: DateTime(2026, 4, 1),
     areaCode: '7',
+  ),
+  BlossomCity(
+    name: '창원',
+    bloomDate: DateTime(2026, 3, 26),
+    peakDate: DateTime(2026, 4, 2),
+    areaCode: '36',
   ),
   BlossomCity(
     name: '전주',
@@ -97,6 +115,18 @@ final List<BlossomCity> blossomCities = [
     name: '여수',
     bloomDate: DateTime(2026, 3, 26),
     peakDate: DateTime(2026, 4, 2),
+    areaCode: '38',
+  ),
+  BlossomCity(
+    name: '진주',
+    bloomDate: DateTime(2026, 3, 28),
+    peakDate: DateTime(2026, 4, 4),
+    areaCode: '36',
+  ),
+  BlossomCity(
+    name: '순천',
+    bloomDate: DateTime(2026, 3, 27),
+    peakDate: DateTime(2026, 4, 3),
     areaCode: '38',
   ),
   BlossomCity(
@@ -118,6 +148,18 @@ final List<BlossomCity> blossomCities = [
     areaCode: '3',
   ),
   BlossomCity(
+    name: '청주',
+    bloomDate: DateTime(2026, 3, 30),
+    peakDate: DateTime(2026, 4, 6),
+    areaCode: '33',
+  ),
+  BlossomCity(
+    name: '세종',
+    bloomDate: DateTime(2026, 3, 31),
+    peakDate: DateTime(2026, 4, 7),
+    areaCode: '8',
+  ),
+  BlossomCity(
     name: '서울',
     bloomDate: DateTime(2026, 4, 1),
     peakDate: DateTime(2026, 4, 8),
@@ -130,10 +172,22 @@ final List<BlossomCity> blossomCities = [
     areaCode: '32',
   ),
   BlossomCity(
+    name: '안동',
+    bloomDate: DateTime(2026, 4, 2),
+    peakDate: DateTime(2026, 4, 9),
+    areaCode: '35',
+  ),
+  BlossomCity(
     name: '수원',
     bloomDate: DateTime(2026, 4, 3),
     peakDate: DateTime(2026, 4, 10),
     areaCode: '31',
+  ),
+  BlossomCity(
+    name: '속초',
+    bloomDate: DateTime(2026, 4, 3),
+    peakDate: DateTime(2026, 4, 10),
+    areaCode: '32',
   ),
   BlossomCity(
     name: '인천',
