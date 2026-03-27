@@ -23,6 +23,15 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Create api_keys stub
+        run: |
+          mkdir -p lib/core/config
+          cat > lib/core/config/api_keys.dart << 'EOF'
+          class ApiKeys {
+            static const String tourApi = 'CI_STUB';
+          }
+          EOF
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -48,6 +57,15 @@ jobs:
           flutter-version: '3.38.3'
           channel: 'stable'
           cache: true
+
+      - name: Create api_keys stub
+        run: |
+          mkdir -p lib/core/config
+          cat > lib/core/config/api_keys.dart << 'EOF'
+          class ApiKeys {
+            static const String tourApi = 'CI_STUB';
+          }
+          EOF
 
       - name: Install dependencies
         run: flutter pub get
@@ -84,6 +102,15 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Create api_keys stub
+        run: |
+          mkdir -p lib/core/config
+          cat > lib/core/config/api_keys.dart << 'EOF'
+          class ApiKeys {
+            static const String tourApi = 'CI_STUB';
+          }
+          EOF
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -114,6 +141,15 @@ jobs:
           flutter-version: '3.38.3'
           channel: 'stable'
           cache: true
+
+      - name: Create api_keys from secret
+        run: |
+          mkdir -p lib/core/config
+          cat > lib/core/config/api_keys.dart << EOF
+          class ApiKeys {
+            static const String tourApi = '${{ secrets.TOUR_API_KEY }}';
+          }
+          EOF
 
       - name: Install dependencies
         run: flutter pub get
@@ -146,6 +182,15 @@ jobs:
           flutter-version: '3.38.3'
           channel: 'stable'
           cache: true
+
+      - name: Create api_keys stub
+        run: |
+          mkdir -p lib/core/config
+          cat > lib/core/config/api_keys.dart << 'EOF'
+          class ApiKeys {
+            static const String tourApi = 'CI_STUB';
+          }
+          EOF
 
       - name: Install dependencies
         run: flutter pub get
