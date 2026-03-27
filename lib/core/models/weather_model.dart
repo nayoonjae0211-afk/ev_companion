@@ -13,13 +13,13 @@ class HourlyForecast {
 
   static String _conditionEmoji(int code) {
     if (code == 1000) return '☀️';
-    if (code == 1003) return '🌤';
+    if (code == 1003) return '🌤️';
     if (code == 1006 || code == 1009) return '☁️';
-    if (code == 1030 || code == 1135 || code == 1147) return '🌫';
-    if (code >= 1273 && code <= 1282) return '⛈';
-    if (code >= 1210 && code <= 1264) return '🌨';
-    if (code >= 1150 && code <= 1201) return '🌧';
-    if (code >= 1063 && code <= 1072) return '🌦';
+    if (code == 1030 || code == 1135 || code == 1147) return '🌁';
+    if (code >= 1273 && code <= 1282) return '⛈️';
+    if (code >= 1210 && code <= 1264) return '🌨️';
+    if (code >= 1150 && code <= 1201) return '🌧️';
+    if (code >= 1063 && code <= 1072) return '🌦️';
     return '⛅';
   }
 }
@@ -57,25 +57,29 @@ class WeatherData {
     final forecastDay = json['forecast']?['forecastday']?[0];
     final dayData = forecastDay?['day'];
 
-    // 시간별 예보: 현재 시각 기준 이후 5개
+    // 시간별 예보: 현재 시각 기준 이후 5개 (오늘 부족하면 내일로 이어짐)
     final hourlyList = <HourlyForecast>[];
-    final hours = forecastDay?['hour'] as List<dynamic>?;
-    if (hours != null) {
-      final nowHour = DateTime.now().hour;
-      bool foundFirst = false;
+    final forecastDays =
+        json['forecast']?['forecastday'] as List<dynamic>? ?? [];
+    final nowHour = DateTime.now().hour;
+    bool foundFirst = false;
+    for (int dayIdx = 0;
+        dayIdx < forecastDays.length && hourlyList.length < 5;
+        dayIdx++) {
+      final hours = forecastDays[dayIdx]['hour'] as List<dynamic>;
       for (final h in hours) {
-        final timeStr = h['time'] as String; // "2026-03-27 14:00"
+        if (hourlyList.length >= 5) break;
+        final timeStr = h['time'] as String;
         final hh = int.parse(timeStr.split(' ')[1].split(':')[0]);
-        if (hh >= nowHour && hourlyList.length < 5) {
-          hourlyList.add(
-            HourlyForecast(
-              label: foundFirst ? '$hh시' : '지금',
-              tempC: (h['temp_c'] as num).toDouble(),
-              conditionCode: h['condition']['code'] as int,
-            ),
-          );
-          foundFirst = true;
-        }
+        if (dayIdx == 0 && hh < nowHour) continue;
+        hourlyList.add(
+          HourlyForecast(
+            label: foundFirst ? '$hh시' : '지금',
+            tempC: (h['temp_c'] as num).toDouble(),
+            conditionCode: h['condition']['code'] as int,
+          ),
+        );
+        foundFirst = true;
       }
     }
 
