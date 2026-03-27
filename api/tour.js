@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') {
@@ -8,9 +8,15 @@ export default async function handler(req, res) {
 
   const { areaCode, keyword, type } = req.query;
   const apiKey = process.env.TOUR_API_KEY;
-  const base = 'https://apis.data.go.kr/B551011/KorService2';
 
+  if (!apiKey) {
+    res.status(500).json({ error: 'TOUR_API_KEY not configured' });
+    return;
+  }
+
+  const base = 'https://apis.data.go.kr/B551011/KorService2';
   const endpoint = type === 'keyword' ? 'searchKeyword2' : 'areaBasedList2';
+
   const params = new URLSearchParams({
     serviceKey: apiKey,
     numOfRows: '10',
@@ -35,4 +41,4 @@ export default async function handler(req, res) {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
-}
+};
