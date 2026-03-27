@@ -2,14 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { strings, type Locale } from '@/lib/i18n';
+import { strings } from '@/lib/i18n';
+import { useLocale } from '@/lib/locale-context';
 
-interface Props {
-  locale: Locale;
-}
-
-export default function Navigation({ locale }: Props) {
+export default function Navigation() {
   const pathname = usePathname();
+  const { locale } = useLocale();
   const t = strings[locale];
 
   const tabs = [
