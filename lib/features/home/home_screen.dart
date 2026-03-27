@@ -292,16 +292,12 @@ class _HourlyCard extends StatelessWidget {
   final WeatherData weather;
   const _HourlyCard({required this.weather});
 
-  static const _hourly = [
-    (time: '지금', icon: '☀️', temp: '18°'),
-    (time: '13시', icon: '🌤', temp: '20°'),
-    (time: '14시', icon: '⛅', temp: '22°'),
-    (time: '15시', icon: '🌥', temp: '21°'),
-    (time: '16시', icon: '🌦', temp: '19°'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final slots = weather.hourly.isNotEmpty
+        ? weather.hourly
+        : null;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -323,14 +319,26 @@ class _HourlyCard extends StatelessWidget {
           const SizedBox(height: 8),
           Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _hourly
-                .map(
-                  (d) => _HourlySlot(time: d.time, icon: d.icon, temp: d.temp),
-                )
-                .toList(),
-          ),
+          if (slots != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: slots
+                  .map(
+                    (h) => _HourlySlot(
+                      time: h.label,
+                      icon: h.emoji,
+                      temp: '${h.tempC.round()}°',
+                    ),
+                  )
+                  .toList(),
+            )
+          else
+            const Center(
+              child: Text(
+                '시간별 데이터 없음',
+                style: TextStyle(color: _textSub, fontSize: 12),
+              ),
+            ),
         ],
       ),
     );
