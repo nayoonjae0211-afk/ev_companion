@@ -98,7 +98,40 @@ jobs:
           retention-days: 7
 
   # ─────────────────────────────────────────
-  # 4. Build iOS (macOS runner)
+  # 4. Build Web & Deploy to Vercel
+  # ─────────────────────────────────────────
+  deploy-web:
+    name: Build Web & Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.3'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        run: flutter build web --release --base-href /
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
+  # ─────────────────────────────────────────
+  # 5. Build iOS (macOS runner)
   # ─────────────────────────────────────────
   build-ios:
     name: Build iOS

@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import '../config/api_keys.dart';
 import '../models/blossom_model.dart';
 
 class TourApiService {
-  static const _base = 'https://apis.data.go.kr/B551011/KorService2';
+  static const _mobileBase = 'https://apis.data.go.kr/B551011/KorService2';
 
   /// 지역 기반 벚꽃 명소 조회 (관광지 타입)
   Future<List<TouristSpot>> fetchBlossomSpots(String areaCode) async {
@@ -20,19 +21,31 @@ class TourApiService {
     String areaCode,
     String keyword,
   ) async {
-    final uri = Uri.parse('$_base/searchKeyword2').replace(
-      queryParameters: {
-        'serviceKey': ApiKeys.tourApi,
-        'numOfRows': '10',
-        'pageNo': '1',
-        'MobileOS': 'AND',
-        'MobileApp': 'EvCompanion',
-        '_type': 'json',
-        'keyword': keyword,
-        'areaCode': areaCode,
-        'contentTypeId': '12', // 관광지
-      },
-    );
+    final Uri uri;
+    if (kIsWeb) {
+      uri = Uri(
+        path: '/api/tour',
+        queryParameters: {
+          'type': 'keyword',
+          'areaCode': areaCode,
+          'keyword': keyword,
+        },
+      );
+    } else {
+      uri = Uri.parse('$_mobileBase/searchKeyword2').replace(
+        queryParameters: {
+          'serviceKey': ApiKeys.tourApi,
+          'numOfRows': '10',
+          'pageNo': '1',
+          'MobileOS': 'AND',
+          'MobileApp': 'EvCompanion',
+          '_type': 'json',
+          'keyword': keyword,
+          'areaCode': areaCode,
+          'contentTypeId': '12',
+        },
+      );
+    }
 
     try {
       final res = await http.get(uri).timeout(const Duration(seconds: 10));
@@ -44,19 +57,27 @@ class TourApiService {
   }
 
   Future<List<TouristSpot>> _searchByArea(String areaCode) async {
-    final uri = Uri.parse('$_base/areaBasedList2').replace(
-      queryParameters: {
-        'serviceKey': ApiKeys.tourApi,
-        'numOfRows': '10',
-        'pageNo': '1',
-        'MobileOS': 'AND',
-        'MobileApp': 'EvCompanion',
-        '_type': 'json',
-        'areaCode': areaCode,
-        'contentTypeId': '12',
-        'cat2': 'A0101', // 자연 > 자연관광지
-      },
-    );
+    final Uri uri;
+    if (kIsWeb) {
+      uri = Uri(
+        path: '/api/tour',
+        queryParameters: {'type': 'area', 'areaCode': areaCode},
+      );
+    } else {
+      uri = Uri.parse('$_mobileBase/areaBasedList2').replace(
+        queryParameters: {
+          'serviceKey': ApiKeys.tourApi,
+          'numOfRows': '10',
+          'pageNo': '1',
+          'MobileOS': 'AND',
+          'MobileApp': 'EvCompanion',
+          '_type': 'json',
+          'areaCode': areaCode,
+          'contentTypeId': '12',
+          'cat2': 'A0101', // 자연 > 자연관광지
+        },
+      );
+    }
 
     try {
       final res = await http.get(uri).timeout(const Duration(seconds: 10));
