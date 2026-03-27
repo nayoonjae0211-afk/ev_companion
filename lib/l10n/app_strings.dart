@@ -9,6 +9,7 @@ class AppStrings {
   String get appTitle => _isKo ? '날씨 & 벚꽃' : 'Weather & Blossom';
   String get home => _isKo ? '날씨' : 'Weather';
   String get cityTab => _isKo ? '도시' : 'City';
+  String get blossomTab => _isKo ? '벚꽃' : 'Blossom';
   String get settings => _isKo ? '설정' : 'Settings';
 
   // Home

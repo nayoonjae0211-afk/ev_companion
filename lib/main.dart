@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/providers/locale_provider.dart';
 import 'features/home/home_screen.dart';
-import 'features/control/control_screen.dart';
+import 'features/blossom/blossom_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'l10n/app_strings.dart';
 
@@ -56,7 +56,7 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell> {
   int _selectedIndex = 0;
 
-  static const _screens = [HomeScreen(), CityScreen(), SettingsScreen()];
+  static const _screens = [HomeScreen(), BlossomScreen(), SettingsScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +78,14 @@ class _MainShellState extends ConsumerState<MainShell> {
           ),
           NavigationDestination(
             icon: const Icon(
-              Icons.location_city_outlined,
-              color: Color(0xFFCCDEFF),
+              Icons.local_florist_outlined,
+              color: Color(0xFFFFB7D0),
             ),
             selectedIcon: const Icon(
-              Icons.location_city,
-              color: Color(0xFF4DC0FF),
+              Icons.local_florist,
+              color: Color(0xFFFF6B9D),
             ),
-            label: s.cityTab,
+            label: s.blossomTab,
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined, color: Color(0xFFCCDEFF)),

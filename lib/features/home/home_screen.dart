@@ -5,6 +5,35 @@ import '../../core/providers/locale_provider.dart';
 import '../../core/models/weather_model.dart';
 import '../../l10n/app_strings.dart';
 
+const _weatherCities = ['서울', '부산', '제주', '대구', '인천', '광주', '대전'];
+
+class _CityDropdown extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selected = ref.watch(selectedCityProvider);
+    return DropdownButtonHideUnderline(
+      child: DropdownButton<String>(
+        value: _weatherCities.contains(selected) ? selected : _weatherCities[0],
+        dropdownColor: const Color(0xFF1A3070),
+        icon: const Icon(
+          Icons.keyboard_arrow_down,
+          color: Colors.white70,
+          size: 18,
+        ),
+        style: const TextStyle(color: Colors.white, fontSize: 15),
+        items: _weatherCities
+            .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+            .toList(),
+        onChanged: (city) {
+          if (city == null) return;
+          ref.read(selectedCityProvider.notifier).select(city);
+          ref.read(weatherProvider.notifier).refresh();
+        },
+      ),
+    );
+  }
+}
+
 // Figma 디자인 기준 색상
 const _bgTop = Color(0xFF192F6E);
 const _bgBottom = Color(0xFF0A1A3D);
@@ -115,6 +144,8 @@ class _WeatherBody extends StatelessWidget {
               elevation: 0,
               pinned: false,
               floating: true,
+              title: _CityDropdown(),
+              centerTitle: false,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.refresh, color: Colors.white70),
