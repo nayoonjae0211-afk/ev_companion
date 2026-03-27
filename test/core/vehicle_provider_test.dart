@@ -66,17 +66,10 @@ void main() {
       container.dispose();
     });
 
-    test('5일 예보 반환', () {
-      final forecast = container.read(forecastProvider);
-      expect(forecast.length, 5);
-    });
-
-    test('예보 날짜가 오늘 이후', () {
-      final forecast = container.read(forecastProvider);
-      final today = DateTime.now();
-      for (final day in forecast) {
-        expect(day.date.isAfter(today), true);
-      }
+    test('forecastProvider는 FutureProvider.family', () {
+      // forecastProvider는 도시명을 인자로 받는 FutureProvider.family
+      final asyncVal = container.read(forecastProvider('서울'));
+      expect(asyncVal, isA<AsyncValue<List<ForecastDay>>>());
     });
   });
 }

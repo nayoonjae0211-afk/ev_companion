@@ -26,10 +26,10 @@ class WeatherData {
   factory WeatherData.fromJson(Map<String, dynamic> json) {
     return WeatherData(
       cityName: json['name'] as String,
-      tempC: (json['main']['temp'] as num).toDouble() - 273.15,
-      feelsLikeC: (json['main']['feels_like'] as num).toDouble() - 273.15,
-      tempMinC: (json['main']['temp_min'] as num).toDouble() - 273.15,
-      tempMaxC: (json['main']['temp_max'] as num).toDouble() - 273.15,
+      tempC: (json['main']['temp'] as num).toDouble(),
+      feelsLikeC: (json['main']['feels_like'] as num).toDouble(),
+      tempMinC: (json['main']['temp_min'] as num).toDouble(),
+      tempMaxC: (json['main']['temp_max'] as num).toDouble(),
       description: json['weather'][0]['description'] as String,
       iconCode: json['weather'][0]['icon'] as String,
       humidity: json['main']['humidity'] as int,

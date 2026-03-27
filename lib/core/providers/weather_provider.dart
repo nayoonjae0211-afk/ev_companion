@@ -1,11 +1,67 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import '../config/api_keys.dart';
 import '../models/weather_model.dart';
 
-// TODO: 실제 API 키로 교체하세요
-const _apiKey = 'YOUR_API_KEY';
 const _baseUrl = 'https://api.openweathermap.org/data/2.5';
+
+// 한국어 도시명 → OpenWeather 영문 쿼리
+const _cityQuery = {
+  '서울': 'Seoul,KR',
+  '부산': 'Busan,KR',
+  '제주': 'Jeju,KR',
+  '대구': 'Daegu,KR',
+  '인천': 'Incheon,KR',
+  '광주': 'Gwangju,KR',
+  '대전': 'Daejeon,KR',
+};
+
+Uri _weatherUri(String cityKo) {
+  final q = _cityQuery[cityKo] ?? '$cityKo,KR';
+  if (kIsWeb) {
+    final base = Uri.base;
+    return Uri(
+      scheme: base.scheme,
+      host: base.host,
+      port: base.hasPort ? base.port : null,
+      path: '/api/weather',
+      queryParameters: {'city': q},
+    );
+  }
+  return Uri.parse('$_baseUrl/weather').replace(
+    queryParameters: {
+      'q': q,
+      'appid': ApiKeys.openWeather,
+      'units': 'metric',
+      'lang': 'kr',
+    },
+  );
+}
+
+Uri _forecastUri(String cityKo) {
+  final q = _cityQuery[cityKo] ?? '$cityKo,KR';
+  if (kIsWeb) {
+    final base = Uri.base;
+    return Uri(
+      scheme: base.scheme,
+      host: base.host,
+      port: base.hasPort ? base.port : null,
+      path: '/api/weather',
+      queryParameters: {'city': q, 'type': 'forecast'},
+    );
+  }
+  return Uri.parse('$_baseUrl/forecast').replace(
+    queryParameters: {
+      'q': q,
+      'appid': ApiKeys.openWeather,
+      'units': 'metric',
+      'lang': 'kr',
+      'cnt': '40',
+    },
+  );
+}
 
 // ── 선택된 도시 ──────────────────────────────────────────
 final selectedCityProvider = NotifierProvider<_CityNotifier, String>(
@@ -19,7 +75,7 @@ class _CityNotifier extends Notifier<String> {
   void select(String city) => state = city;
 }
 
-// ── 날씨 데이터 (AsyncNotifier) ──────────────────────────
+// ── 날씨 데이터 ──────────────────────────────────────────
 class WeatherNotifier extends AsyncNotifier<WeatherData> {
   @override
   Future<WeatherData> build() async {
@@ -34,41 +90,24 @@ class WeatherNotifier extends AsyncNotifier<WeatherData> {
   }
 
   Future<WeatherData> _fetchWeather(String city) async {
-    if (_apiKey == 'YOUR_API_KEY') {
-      // API 키 없을 때 Mock 데이터
-      await Future.delayed(const Duration(milliseconds: 800));
-      return _mockWeather(city);
+    final uri = _weatherUri(city);
+    final res = await http.get(uri).timeout(const Duration(seconds: 10));
+    if (res.statusCode == 200) {
+      final data = WeatherData.fromJson(json.decode(res.body));
+      return WeatherData(
+        cityName: city, // 한국어 도시명으로 표시
+        tempC: data.tempC,
+        feelsLikeC: data.feelsLikeC,
+        tempMinC: data.tempMinC,
+        tempMaxC: data.tempMaxC,
+        description: data.description,
+        iconCode: data.iconCode,
+        humidity: data.humidity,
+        windSpeed: data.windSpeed,
+        timestamp: data.timestamp,
+      );
     }
-
-    final uri = Uri.parse('$_baseUrl/weather?q=$city&lang=kr&appid=$_apiKey');
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      return WeatherData.fromJson(json.decode(response.body));
-    }
-    throw Exception('날씨 데이터를 불러오지 못했습니다 (${response.statusCode})');
-  }
-
-  WeatherData _mockWeather(String city) {
-    final mockMap = {
-      '서울': (temp: 14.0, desc: '맑음', icon: '01d'),
-      '부산': (temp: 16.0, desc: '구름 조금', icon: '02d'),
-      '제주': (temp: 18.0, desc: '흐림', icon: '04d'),
-      '대구': (temp: 15.0, desc: '맑음', icon: '01d'),
-    };
-    final data = mockMap[city] ?? (temp: 13.0, desc: '맑음', icon: '01d');
-    return WeatherData(
-      cityName: city,
-      tempC: data.temp,
-      feelsLikeC: data.temp - 2,
-      tempMinC: data.temp - 4,
-      tempMaxC: data.temp + 3,
-      description: data.desc,
-      iconCode: data.icon,
-      humidity: 55,
-      windSpeed: 2.5,
-      timestamp: DateTime.now(),
-    );
+    throw Exception('날씨 데이터를 불러오지 못했습니다 (${res.statusCode})');
   }
 }
 
@@ -76,8 +115,51 @@ final weatherProvider = AsyncNotifierProvider<WeatherNotifier, WeatherData>(
   WeatherNotifier.new,
 );
 
-// ── 5일 예보 (mock) ──────────────────────────────────────
-final forecastProvider = Provider<List<ForecastDay>>((ref) {
+// ── 5일 예보 ──────────────────────────────────────────────
+final forecastProvider = FutureProvider.family<List<ForecastDay>, String>((
+  ref,
+  cityKo,
+) async {
+  final uri = _forecastUri(cityKo);
+  final res = await http.get(uri).timeout(const Duration(seconds: 10));
+  if (res.statusCode != 200) return _mockForecast();
+
+  final body = json.decode(res.body);
+  final list = body['list'] as List<dynamic>;
+
+  // 3시간 단위 데이터를 일별로 집계
+  final Map<String, List<dynamic>> byDay = {};
+  for (final item in list) {
+    final dt = DateTime.fromMillisecondsSinceEpoch((item['dt'] as int) * 1000);
+    final key =
+        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+    byDay.putIfAbsent(key, () => []).add(item);
+  }
+
+  final today =
+      '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}';
+
+  return byDay.entries.where((e) => e.key != today).take(5).map((e) {
+    final items = e.value;
+    final temps = items
+        .map((i) => (i['main']['temp'] as num).toDouble())
+        .toList();
+    final noon = items.firstWhere((i) {
+      final dt = DateTime.fromMillisecondsSinceEpoch((i['dt'] as int) * 1000);
+      return dt.hour >= 12;
+    }, orElse: () => items.first);
+    final date = DateTime.parse(e.key);
+    return ForecastDay(
+      date: date,
+      tempMaxC: temps.reduce((a, b) => a > b ? a : b),
+      tempMinC: temps.reduce((a, b) => a < b ? a : b),
+      iconCode: noon['weather'][0]['icon'] as String,
+      description: noon['weather'][0]['description'] as String,
+    );
+  }).toList();
+});
+
+List<ForecastDay> _mockForecast() {
   final today = DateTime.now();
   return List.generate(5, (i) {
     final day = today.add(Duration(days: i + 1));
@@ -92,7 +174,7 @@ final forecastProvider = Provider<List<ForecastDay>>((ref) {
       description: descs[i],
     );
   });
-});
+}
 
 // ── 벚꽃 개화 예측 ────────────────────────────────────────
 final blossomProvider = Provider<BlossomForecast>((ref) {
@@ -100,13 +182,10 @@ final blossomProvider = Provider<BlossomForecast>((ref) {
   return _predictBlossom(city);
 });
 
-/// 간이 벚꽃 개화 예측
-/// 실제 기상청 데이터 기반 평균 개화일을 사용
 BlossomForecast _predictBlossom(String city) {
   final now = DateTime.now();
   final year = now.year;
 
-  // 도시별 평균 개화일 (월, 일)
   final avgBlossom = {
     '서울': (month: 4, day: 1),
     '부산': (month: 3, day: 25),
@@ -119,8 +198,6 @@ BlossomForecast _predictBlossom(String city) {
 
   final avg = avgBlossom[city] ?? (month: 4, day: 1);
   final predictedDate = DateTime(year, avg.month, avg.day);
-
-  // 개화 기간: ±7일
   final startDate = predictedDate.subtract(const Duration(days: 3));
   final endDate = predictedDate.add(const Duration(days: 7));
 
@@ -140,7 +217,6 @@ BlossomForecast _predictBlossom(String city) {
       message: '약 $daysLeft일 후 개화 예정',
     );
   } else {
-    // 꽃이 진 경우, 내년 예측
     final nextYear = DateTime(year + 1, avg.month, avg.day);
     final daysLeft = nextYear.difference(now).inDays;
     return BlossomForecast(

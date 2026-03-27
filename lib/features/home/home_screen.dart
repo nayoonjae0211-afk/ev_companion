@@ -48,7 +48,9 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final weatherAsync = ref.watch(weatherProvider);
-    final forecast = ref.watch(forecastProvider);
+    final city = ref.watch(selectedCityProvider);
+    final forecastAsync = ref.watch(forecastProvider(city));
+    final forecast = forecastAsync.value ?? [];
     final blossom = ref.watch(blossomProvider);
     final s = AppStrings(ref.watch(localeProvider));
 
