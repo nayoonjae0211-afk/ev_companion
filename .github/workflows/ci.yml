@@ -1,216 +1,37 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
-  # ─────────────────────────────────────────
-  # 1. Lint & Analyze
-  # ─────────────────────────────────────────
-  analyze:
-    name: Lint & Analyze
+  lint-and-build:
+    name: Lint & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Create api_keys stub
-        run: |
-          mkdir -p lib/core/config
-          cat > lib/core/config/api_keys.dart << 'EOF'
-          class ApiKeys {
-            static const String tourApi = 'CI_STUB';
-            static const String openWeather = 'CI_STUB';
-            static const String weatherApi = 'CI_STUB';
-          }
-          EOF
+          node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: flutter pub get
+        run: npm ci
 
-      - name: Run flutter analyze
-        run: flutter analyze --no-fatal-infos
+      - name: Lint
+        run: npm run lint
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib/ test/
+      - name: Type check
+        run: npx tsc --noEmit
 
-  # ─────────────────────────────────────────
-  # 2. Unit Tests
-  # ─────────────────────────────────────────
-  test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: analyze
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Create api_keys stub
-        run: |
-          mkdir -p lib/core/config
-          cat > lib/core/config/api_keys.dart << 'EOF'
-          class ApiKeys {
-            static const String tourApi = 'CI_STUB';
-            static const String openWeather = 'CI_STUB';
-            static const String weatherApi = 'CI_STUB';
-          }
-          EOF
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run tests with coverage
-        run: flutter test --coverage
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/lcov.info
-
-  # ─────────────────────────────────────────
-  # 3. Build Android APK
-  # ─────────────────────────────────────────
-  build-android:
-    name: Build Android APK
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Create api_keys stub
-        run: |
-          mkdir -p lib/core/config
-          cat > lib/core/config/api_keys.dart << 'EOF'
-          class ApiKeys {
-            static const String tourApi = 'CI_STUB';
-            static const String openWeather = 'CI_STUB';
-            static const String weatherApi = 'CI_STUB';
-          }
-          EOF
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build release APK
-        run: flutter build apk --release --split-per-abi
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: build/app/outputs/flutter-apk/*.apk
-          retention-days: 7
-
-  # ─────────────────────────────────────────
-  # 4. Build Web & Deploy to Vercel
-  # ─────────────────────────────────────────
-  deploy-web:
-    name: Build Web & Deploy to Vercel
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Create api_keys from secret
-        run: |
-          mkdir -p lib/core/config
-          cat > lib/core/config/api_keys.dart << EOF
-          class ApiKeys {
-            static const String tourApi = '${{ secrets.TOUR_API_KEY }}';
-            static const String openWeather = '${{ secrets.OPENWEATHER_API_KEY }}';
-            static const String weatherApi = '${{ secrets.WEATHERAPI_KEY }}';
-          }
-          EOF
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build Flutter Web
-        run: flutter build web --release --base-href /
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./
-
-  # ─────────────────────────────────────────
-  # 5. Build iOS (macOS runner)
-  # ─────────────────────────────────────────
-  build-ios:
-    name: Build iOS
-    runs-on: macos-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.38.3'
-          channel: 'stable'
-          cache: true
-
-      - name: Create api_keys stub
-        run: |
-          mkdir -p lib/core/config
-          cat > lib/core/config/api_keys.dart << 'EOF'
-          class ApiKeys {
-            static const String tourApi = 'CI_STUB';
-            static const String openWeather = 'CI_STUB';
-            static const String weatherApi = 'CI_STUB';
-          }
-          EOF
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
-
-      - name: Upload iOS artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app
-          retention-days: 7
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          WEATHERAPI_KEY: ${{ secrets.WEATHERAPI_KEY }}
+          TOUR_API_KEY: ${{ secrets.TOUR_API_KEY }}

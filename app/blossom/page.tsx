@@ -1,0 +1,99 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useLocale } from '@/lib/locale-context';
+import { strings } from '@/lib/i18n';
+import { blossomStatus, daysUntilBloom } from '@/lib/weather-utils';
+import type { City, BlossomCity } from '@/lib/types';
+import SpotSheet from '@/components/blossom/SpotSheet';
+
+const PetalCanvas = dynamic(() => import('@/components/blossom/PetalCanvas'), { ssr: false });
+
+const STATUS_STYLE: Record<string, { badge: string; ring: string }> = {
+  beforeBloom: { badge: 'bg-zinc-700/60 text-zinc-300', ring: 'ring-zinc-700/40' },
+  blooming:    { badge: 'bg-pink-500/20 text-pink-300', ring: 'ring-pink-500/30' },
+  peaking:     { badge: 'bg-pink-400/30 text-pink-200', ring: 'ring-pink-400/40' },
+  ended:       { badge: 'bg-zinc-800/60 text-zinc-500', ring: 'ring-zinc-700/20' },
+};
+
+export default function BlossomPage() {
+  const { locale } = useLocale();
+  const t = strings[locale];
+
+  const [cities, setCities] = useState<BlossomCity[]>([]);
+  const [selected, setSelected] = useState<BlossomCity | null>(null);
+
+  useEffect(() => {
+    fetch('/api/cities')
+      .then((r) => r.json())
+      .then((data: City[]) => {
+        const mapped: BlossomCity[] = data
+          .filter((c) => c.bloom_date && c.peak_date)
+          .map((c) => ({
+            ...c,
+            status: blossomStatus(c.bloom_date!, c.peak_date!),
+            daysUntilBloom: daysUntilBloom(c.bloom_date!),
+          }));
+        setCities(mapped);
+      })
+      .catch(() => {});
+  }, []);
+
+  const statusLabel = (city: BlossomCity) => {
+    if (city.status === 'beforeBloom') {
+      return city.daysUntilBloom > 0 ? t.daysUntil(city.daysUntilBloom) : t.blooming;
+    }
+    return { blooming: t.blooming, peaking: t.peaking, ended: t.ended }[city.status];
+  };
+
+  return (
+    <div className="relative min-h-screen">
+      <PetalCanvas />
+
+      <div className="relative z-10 pt-4 pb-8">
+        <h1 className="text-xl font-bold text-white mb-1">{t.blossomForecast}</h1>
+        <p className="text-sm text-zinc-500 mb-5">2026 벚꽃 개화 예측</p>
+
+        <div className="grid grid-cols-2 gap-3">
+          {cities.map((city) => {
+            const style = STATUS_STYLE[city.status];
+            const name = locale === 'ko' ? city.name_ko : city.name_en;
+            const date = city.bloom_date
+              ? new Date(city.bloom_date).toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                })
+              : '';
+
+            return (
+              <button
+                key={city.id}
+                onClick={() => setSelected(city)}
+                className={`glass rounded-2xl p-4 text-left ring-1 ${style.ring} hover:bg-white/[0.06] transition-all active:scale-95`}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <span className="text-2xl">🌸</span>
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${style.badge}`}>
+                    {statusLabel(city)}
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-white">{name}</p>
+                <p className="text-xs text-zinc-500 mt-0.5">{date}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {selected && (
+        <SpotSheet
+          city={selected}
+          t={t}
+          locale={locale}
+          onClose={() => setSelected(null)}
+        />
+      )}
+    </div>
+  );
+}
