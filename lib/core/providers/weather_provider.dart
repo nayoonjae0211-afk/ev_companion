@@ -5,21 +5,20 @@ import 'package:http/http.dart' as http;
 import '../config/api_keys.dart';
 import '../models/weather_model.dart';
 
-const _baseUrl = 'https://api.openweathermap.org/data/2.5';
+const _waBase = 'https://api.weatherapi.com/v1/forecast.json';
 
-// 한국어 도시명 → OpenWeather 영문 쿼리
 const _cityQuery = {
-  '서울': 'Seoul,KR',
-  '부산': 'Busan,KR',
-  '제주': 'Jeju,KR',
-  '대구': 'Daegu,KR',
-  '인천': 'Incheon,KR',
-  '광주': 'Gwangju,KR',
-  '대전': 'Daejeon,KR',
+  '서울': 'Seoul',
+  '부산': 'Busan',
+  '제주': 'Jeju',
+  '대구': 'Daegu',
+  '인천': 'Incheon',
+  '광주': 'Gwangju',
+  '대전': 'Daejeon',
 };
 
 Uri _weatherUri(String cityKo) {
-  final q = _cityQuery[cityKo] ?? '$cityKo,KR';
+  final q = _cityQuery[cityKo] ?? cityKo;
   if (kIsWeb) {
     final base = Uri.base;
     return Uri(
@@ -30,35 +29,14 @@ Uri _weatherUri(String cityKo) {
       queryParameters: {'city': q},
     );
   }
-  return Uri.parse('$_baseUrl/weather').replace(
+  return Uri.parse(_waBase).replace(
     queryParameters: {
+      'key': ApiKeys.weatherApi,
       'q': q,
-      'appid': ApiKeys.openWeather,
-      'units': 'metric',
-      'lang': 'kr',
-    },
-  );
-}
-
-Uri _forecastUri(String cityKo) {
-  final q = _cityQuery[cityKo] ?? '$cityKo,KR';
-  if (kIsWeb) {
-    final base = Uri.base;
-    return Uri(
-      scheme: base.scheme,
-      host: base.host,
-      port: base.hasPort ? base.port : null,
-      path: '/api/weather',
-      queryParameters: {'city': q, 'type': 'forecast'},
-    );
-  }
-  return Uri.parse('$_baseUrl/forecast').replace(
-    queryParameters: {
-      'q': q,
-      'appid': ApiKeys.openWeather,
-      'units': 'metric',
-      'lang': 'kr',
-      'cnt': '40',
+      'lang': 'ko',
+      'days': '6',
+      'aqi': 'no',
+      'alerts': 'no',
     },
   );
 }
@@ -93,19 +71,7 @@ class WeatherNotifier extends AsyncNotifier<WeatherData> {
     final uri = _weatherUri(city);
     final res = await http.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode == 200) {
-      final data = WeatherData.fromJson(json.decode(res.body));
-      return WeatherData(
-        cityName: city, // 한국어 도시명으로 표시
-        tempC: data.tempC,
-        feelsLikeC: data.feelsLikeC,
-        tempMinC: data.tempMinC,
-        tempMaxC: data.tempMaxC,
-        description: data.description,
-        iconCode: data.iconCode,
-        humidity: data.humidity,
-        windSpeed: data.windSpeed,
-        timestamp: data.timestamp,
-      );
+      return WeatherData.fromWeatherApi(json.decode(res.body), city);
     }
     throw Exception('날씨 데이터를 불러오지 못했습니다 (${res.statusCode})');
   }
@@ -120,41 +86,27 @@ final forecastProvider = FutureProvider.family<List<ForecastDay>, String>((
   ref,
   cityKo,
 ) async {
-  final uri = _forecastUri(cityKo);
+  final uri = _weatherUri(cityKo);
   final res = await http.get(uri).timeout(const Duration(seconds: 10));
   if (res.statusCode != 200) return _mockForecast();
 
   final body = json.decode(res.body);
-  final list = body['list'] as List<dynamic>;
+  final days = body['forecast']?['forecastday'] as List<dynamic>?;
+  if (days == null) return _mockForecast();
 
-  // 3시간 단위 데이터를 일별로 집계
-  final Map<String, List<dynamic>> byDay = {};
-  for (final item in list) {
-    final dt = DateTime.fromMillisecondsSinceEpoch((item['dt'] as int) * 1000);
-    final key =
-        '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
-    byDay.putIfAbsent(key, () => []).add(item);
-  }
+  final today = DateTime.now();
+  final todayStr =
+      '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
 
-  final today =
-      '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}';
-
-  return byDay.entries.where((e) => e.key != today).take(5).map((e) {
-    final items = e.value;
-    final temps = items
-        .map((i) => (i['main']['temp'] as num).toDouble())
-        .toList();
-    final noon = items.firstWhere((i) {
-      final dt = DateTime.fromMillisecondsSinceEpoch((i['dt'] as int) * 1000);
-      return dt.hour >= 12;
-    }, orElse: () => items.first);
-    final date = DateTime.parse(e.key);
+  return days.where((d) => (d['date'] as String) != todayStr).take(5).map((d) {
+    final day = d['day'] as Map<String, dynamic>;
+    final condition = day['condition'] as Map<String, dynamic>;
     return ForecastDay(
-      date: date,
-      tempMaxC: temps.reduce((a, b) => a > b ? a : b),
-      tempMinC: temps.reduce((a, b) => a < b ? a : b),
-      iconCode: noon['weather'][0]['icon'] as String,
-      description: noon['weather'][0]['description'] as String,
+      date: DateTime.parse(d['date'] as String),
+      tempMaxC: (day['maxtemp_c'] as num).toDouble(),
+      tempMinC: (day['mintemp_c'] as num).toDouble(),
+      iconCode: condition['icon'] as String,
+      description: condition['text'] as String,
     );
   }).toList();
 });
@@ -164,13 +116,12 @@ List<ForecastDay> _mockForecast() {
   return List.generate(5, (i) {
     final day = today.add(Duration(days: i + 1));
     final temps = [16.0, 18.0, 14.0, 12.0, 17.0];
-    final icons = ['02d', '01d', '10d', '03d', '01d'];
     final descs = ['구름 조금', '맑음', '비', '흐림', '맑음'];
     return ForecastDay(
       date: day,
       tempMaxC: temps[i],
       tempMinC: temps[i] - 5,
-      iconCode: icons[i],
+      iconCode: '',
       description: descs[i],
     );
   });

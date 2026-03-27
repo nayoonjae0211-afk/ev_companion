@@ -23,17 +23,24 @@ class WeatherData {
     required this.timestamp,
   });
 
-  factory WeatherData.fromJson(Map<String, dynamic> json) {
+  factory WeatherData.fromWeatherApi(Map<String, dynamic> json, String cityKo) {
+    final current = json['current'] as Map<String, dynamic>;
+    final condition = current['condition'] as Map<String, dynamic>;
+    final forecast = json['forecast']?['forecastday']?[0]?['day'];
     return WeatherData(
-      cityName: json['name'] as String,
-      tempC: (json['main']['temp'] as num).toDouble(),
-      feelsLikeC: (json['main']['feels_like'] as num).toDouble(),
-      tempMinC: (json['main']['temp_min'] as num).toDouble(),
-      tempMaxC: (json['main']['temp_max'] as num).toDouble(),
-      description: json['weather'][0]['description'] as String,
-      iconCode: json['weather'][0]['icon'] as String,
-      humidity: json['main']['humidity'] as int,
-      windSpeed: (json['wind']['speed'] as num).toDouble(),
+      cityName: cityKo,
+      tempC: (current['temp_c'] as num).toDouble(),
+      feelsLikeC: (current['feelslike_c'] as num).toDouble(),
+      tempMinC: forecast != null
+          ? (forecast['mintemp_c'] as num).toDouble()
+          : (current['temp_c'] as num).toDouble() - 4,
+      tempMaxC: forecast != null
+          ? (forecast['maxtemp_c'] as num).toDouble()
+          : (current['temp_c'] as num).toDouble() + 3,
+      description: condition['text'] as String,
+      iconCode: condition['icon'] as String,
+      humidity: (current['humidity'] as num).toInt(),
+      windSpeed: ((current['wind_kph'] as num) / 3.6),
       timestamp: DateTime.now(),
     );
   }

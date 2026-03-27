@@ -374,16 +374,48 @@ class _WeeklyCard extends StatelessWidget {
   final AppStrings strings;
   const _WeeklyCard({required this.forecast, required this.strings});
 
-  static const _weekData = [
-    (day: '오늘', icon: '☀️', low: '12°', high: '23°', pct: 0.9),
-    (day: '내일', icon: '🌤', low: '11°', high: '21°', pct: 0.75),
-    (day: '토요일', icon: '🌦', low: '9°', high: '18°', pct: 0.58),
-    (day: '일요일', icon: '⛅', low: '10°', high: '19°', pct: 0.65),
-    (day: '월요일', icon: '☀️', low: '13°', high: '24°', pct: 0.92),
-  ];
+  static const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+
+  String _emoji(String iconUrl) {
+    if (iconUrl.contains('113') || iconUrl.contains('sunny')) return '☀️';
+    if (iconUrl.contains('116')) return '🌤';
+    if (iconUrl.contains('119') || iconUrl.contains('122')) return '☁️';
+    if (iconUrl.contains('143') ||
+        iconUrl.contains('248') ||
+        iconUrl.contains('260')) {
+      return '🌫';
+    }
+    if (iconUrl.contains('176') ||
+        iconUrl.contains('293') ||
+        iconUrl.contains('296')) {
+      return '🌦';
+    }
+    if (iconUrl.contains('299') ||
+        iconUrl.contains('302') ||
+        iconUrl.contains('305')) {
+      return '🌧';
+    }
+    if (iconUrl.contains('317') ||
+        iconUrl.contains('320') ||
+        iconUrl.contains('323')) {
+      return '🌨';
+    }
+    if (iconUrl.contains('329') ||
+        iconUrl.contains('332') ||
+        iconUrl.contains('335')) {
+      return '❄️';
+    }
+    if (iconUrl.contains('389') || iconUrl.contains('392')) return '⛈';
+    return '🌥';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final data = forecast.isEmpty ? _fallback() : forecast;
+    final allMax = data.map((d) => d.tempMaxC).reduce((a, b) => a > b ? a : b);
+    final allMin = data.map((d) => d.tempMinC).reduce((a, b) => a < b ? a : b);
+    final range = (allMax - allMin).clamp(1.0, double.infinity);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -394,7 +426,7 @@ class _WeeklyCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '10일간의 예보',
+            '5일 예보',
             style: TextStyle(
               color: _textSub,
               fontSize: 12,
@@ -405,19 +437,23 @@ class _WeeklyCard extends StatelessWidget {
           const SizedBox(height: 8),
           Divider(color: Colors.white.withValues(alpha: 0.15), height: 1),
           const SizedBox(height: 4),
-          ..._weekData.asMap().entries.map((e) {
+          ...data.asMap().entries.map((e) {
             final i = e.key;
             final d = e.value;
+            final dayLabel = i == 0
+                ? '내일'
+                : '${_weekdays[d.date.weekday - 1]}요일';
+            final pct = (d.tempMaxC - allMin) / range;
             return Column(
               children: [
                 _WeekRow(
-                  day: d.day,
-                  icon: d.icon,
-                  low: d.low,
-                  high: d.high,
-                  pct: d.pct,
+                  day: dayLabel,
+                  icon: _emoji(d.iconCode),
+                  low: '${d.tempMinC.round()}°',
+                  high: '${d.tempMaxC.round()}°',
+                  pct: pct.clamp(0.3, 1.0),
                 ),
-                if (i < _weekData.length - 1)
+                if (i < data.length - 1)
                   Divider(
                     color: Colors.white.withValues(alpha: 0.08),
                     height: 1,
@@ -428,6 +464,19 @@ class _WeeklyCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<ForecastDay> _fallback() {
+    final today = DateTime.now();
+    return List.generate(5, (i) {
+      return ForecastDay(
+        date: today.add(Duration(days: i + 1)),
+        tempMaxC: 18.0 + i,
+        tempMinC: 10.0 + i,
+        iconCode: '',
+        description: '맑음',
+      );
+    });
   }
 }
 

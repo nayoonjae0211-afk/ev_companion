@@ -7,23 +7,24 @@ module.exports = async function handler(req, res) {
   }
 
   const { city, type } = req.query;
-  const apiKey = process.env.OPENWEATHER_API_KEY;
+  const apiKey = process.env.WEATHERAPI_KEY;
 
   if (!apiKey) {
-    res.status(500).json({ error: 'OPENWEATHER_API_KEY not configured' });
+    res.status(500).json({ error: 'WEATHERAPI_KEY not configured' });
     return;
   }
 
-  const base = 'https://api.openweathermap.org/data/2.5';
-  const endpoint = type === 'forecast' ? 'forecast' : 'weather';
+  const base = 'https://api.weatherapi.com/v1';
+  const endpoint = type === 'forecast' ? 'forecast.json' : 'forecast.json';
 
   const params = new URLSearchParams({
-    q: city || 'Seoul,KR',
-    appid: apiKey,
-    units: 'metric',
-    lang: 'kr',
+    key: apiKey,
+    q: city || 'Seoul',
+    lang: 'ko',
+    days: '6',
+    aqi: 'no',
+    alerts: 'no',
   });
-  if (type === 'forecast') params.set('cnt', '40');
 
   try {
     const response = await fetch(`${base}/${endpoint}?${params}`);
