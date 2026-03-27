@@ -202,6 +202,12 @@ final List<BlossomCity> blossomCities = [
     areaCode: '32',
   ),
   BlossomCity(
+    name: '천안',
+    bloomDate: DateTime(2026, 4, 1),
+    peakDate: DateTime(2026, 4, 8),
+    areaCode: '34',
+  ),
+  BlossomCity(
     name: '서산',
     bloomDate: DateTime(2026, 4, 6),
     peakDate: DateTime(2026, 4, 13),

@@ -32,6 +32,7 @@ const _cityQuery = {
   '진주': 'Jinju',
   '통영': 'Tongyeong',
   '세종': 'Sejong',
+  '천안': 'Cheonan',
 };
 
 Uri _weatherUri(String cityKo) {
@@ -179,6 +180,7 @@ BlossomForecast _predictBlossom(String city) {
     '안동': (month: 4, day: 2),
     '춘천': (month: 4, day: 4),
     '서산': (month: 4, day: 6),
+    '천안': (month: 4, day: 1),
     '속초': (month: 4, day: 3),
   };
 
