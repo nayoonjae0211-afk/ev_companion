@@ -62,16 +62,15 @@ class WeatherData {
     final forecastDays =
         json['forecast']?['forecastday'] as List<dynamic>? ?? [];
     final nowHour = DateTime.now().hour;
-    bool foundFirst = false;
-    for (int dayIdx = 0;
-        dayIdx < forecastDays.length && hourlyList.length < 5;
-        dayIdx++) {
-      final hours = forecastDays[dayIdx]['hour'] as List<dynamic>;
-      for (final h in hours) {
+    var foundFirst = false;
+    for (var i = 0; i < forecastDays.length; i++) {
+      if (hourlyList.length >= 5) break;
+      final dayHours = forecastDays[i]['hour'] as List<dynamic>;
+      for (final h in dayHours) {
         if (hourlyList.length >= 5) break;
         final timeStr = h['time'] as String;
         final hh = int.parse(timeStr.split(' ')[1].split(':')[0]);
-        if (dayIdx == 0 && hh < nowHour) continue;
+        if (i == 0 && hh < nowHour) continue;
         hourlyList.add(
           HourlyForecast(
             label: foundFirst ? '$hh시' : '지금',
