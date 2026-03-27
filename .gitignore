@@ -12,6 +12,9 @@ npm-debug.log*
 .env.local
 .env.*.local
 
+# TypeScript
+tsconfig.tsbuildinfo
+
 # Editor
 .DS_Store
 *.swp
