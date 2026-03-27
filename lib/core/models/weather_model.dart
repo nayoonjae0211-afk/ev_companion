@@ -67,11 +67,13 @@ class WeatherData {
         final timeStr = h['time'] as String; // "2026-03-27 14:00"
         final hh = int.parse(timeStr.split(' ')[1].split(':')[0]);
         if (hh >= nowHour && hourlyList.length < 5) {
-          hourlyList.add(HourlyForecast(
-            label: foundFirst ? '$hh시' : '지금',
-            tempC: (h['temp_c'] as num).toDouble(),
-            conditionCode: h['condition']['code'] as int,
-          ));
+          hourlyList.add(
+            HourlyForecast(
+              label: foundFirst ? '$hh시' : '지금',
+              tempC: (h['temp_c'] as num).toDouble(),
+              conditionCode: h['condition']['code'] as int,
+            ),
+          );
           foundFirst = true;
         }
       }

@@ -294,9 +294,7 @@ class _HourlyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slots = weather.hourly.isNotEmpty
-        ? weather.hourly
-        : null;
+    final slots = weather.hourly.isNotEmpty ? weather.hourly : null;
 
     return Container(
       padding: const EdgeInsets.all(16),
