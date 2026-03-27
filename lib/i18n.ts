@@ -69,6 +69,20 @@ export const strings = {
     mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu',
     fri: 'Fri', sat: 'Sat', sun: 'Sun',
   },
-} as const;
+};
 
-export type Strings = typeof strings.ko;
+export type Strings = {
+  weather: string; blossom: string; settings: string;
+  feelsLike: string; high: string; low: string;
+  humidity: string; wind: string;
+  hourlyForecast: string; dailyForecast: string; blossomForecast: string;
+  beforeBloom: string; blooming: string; peaking: string; ended: string;
+  daysUntil: (n: number) => string;
+  touristSpots: string; noSpots: string; openMap: string;
+  language: string; dataSource: string; version: string;
+  now: string; today: string; tomorrow: string;
+  loading: string; error: string; retry: string;
+  selectCity: string; refresh: string;
+  mon: string; tue: string; wed: string; thu: string;
+  fri: string; sat: string; sun: string;
+};
