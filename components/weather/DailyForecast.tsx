@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { conditionEmoji } from '@/lib/weather-utils';
 import type { ForecastDay } from '@/lib/types';
 import type { Strings, Locale } from '@/lib/i18n';
@@ -10,11 +11,16 @@ interface Props {
   locale: Locale;
 }
 
-const DAY_LABELS_KO = ['일', '월', '화', '수', '목', '금', '토'];
-const DAY_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_KEYS: Array<keyof Strings> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-export default function DailyForecast({ forecast, t, locale }: Props) {
+export default function DailyForecast({ forecast, t, locale: _locale }: Props) {
   if (!forecast.length) return null;
+
+  const { maxAll, minAll, range } = useMemo(() => {
+    const maxAll = Math.max(...forecast.map((d) => d.tempMaxC));
+    const minAll = Math.min(...forecast.map((d) => d.tempMinC));
+    return { maxAll, minAll, range: maxAll - minAll || 1 };
+  }, [forecast]);
 
   return (
     <div className="glass rounded-2xl overflow-hidden">
@@ -24,17 +30,13 @@ export default function DailyForecast({ forecast, t, locale }: Props) {
       <div className="divide-y divide-white/[0.06]">
         {forecast.map((day, i) => {
           const date = new Date(day.date);
-          const dayLabels = locale === 'ko' ? DAY_LABELS_KO : DAY_LABELS_EN;
           const label =
             i === 0
               ? t.today
               : i === 1
                 ? t.tomorrow
-                : dayLabels[date.getDay()];
+                : String(t[DAY_KEYS[date.getDay()]]);
 
-          const maxAll = Math.max(...forecast.map((d) => d.tempMaxC));
-          const minAll = Math.min(...forecast.map((d) => d.tempMinC));
-          const range = maxAll - minAll || 1;
           const barLeft = ((day.tempMinC - minAll) / range) * 100;
           const barWidth = ((day.tempMaxC - day.tempMinC) / range) * 100;
 

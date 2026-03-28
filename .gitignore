@@ -20,3 +20,13 @@ next-env.d.ts
 .DS_Store
 *.swp
 .idea/
+
+# Flutter (legacy)
+android/
+ios/
+build/
+.dart_tool/
+*.iml
+.flutter-plugins-dependencies
+.metadata
+lib/core/

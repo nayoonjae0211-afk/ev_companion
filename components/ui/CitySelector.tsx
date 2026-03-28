@@ -22,8 +22,8 @@ export default function CitySelector() {
           setSelectedCity(seoul);
         }
       })
-      .catch(() => {});
-  }, [selectedCity, setSelectedCity]);
+      .catch((err) => console.error('Failed to fetch cities:', err));
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

@@ -37,7 +37,7 @@ export default function SpotSheet({ city, t, locale, onClose }: Props) {
         );
         setSpots(list);
       })
-      .catch(() => {})
+      .catch((err) => console.error('Failed to fetch spots:', err))
       .finally(() => setLoading(false));
   }, [city]);
 

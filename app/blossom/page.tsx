@@ -7,15 +7,9 @@ import { strings } from '@/lib/i18n';
 import { blossomStatus, daysUntilBloom } from '@/lib/weather-utils';
 import type { City, BlossomCity } from '@/lib/types';
 import SpotSheet from '@/components/blossom/SpotSheet';
+import { STATUS_STYLE } from '@/lib/constants';
 
 const PetalCanvas = dynamic(() => import('@/components/blossom/PetalCanvas'), { ssr: false });
-
-const STATUS_STYLE: Record<string, { badge: string; ring: string }> = {
-  beforeBloom: { badge: 'bg-pink-100 text-pink-600',   ring: 'ring-pink-200' },
-  blooming:    { badge: 'bg-pink-200 text-pink-700',   ring: 'ring-pink-300' },
-  peaking:     { badge: 'bg-pink-300 text-pink-800',   ring: 'ring-pink-400' },
-  ended:       { badge: 'bg-zinc-200 text-zinc-500',   ring: 'ring-zinc-300' },
-};
 
 export default function BlossomPage() {
   const { locale } = useLocale();
@@ -37,7 +31,7 @@ export default function BlossomPage() {
           }));
         setCities(mapped);
       })
-      .catch(() => {});
+      .catch((err) => console.error('Failed to fetch blossom cities:', err));
   }, []);
 
   const statusLabel = (city: BlossomCity) => {
@@ -56,7 +50,7 @@ export default function BlossomPage() {
 
       <div className="relative z-10 pt-4 pb-8">
         <h1 className="text-xl font-bold text-zinc-800 mb-1">{t.blossomForecast}</h1>
-        <p className="text-sm text-pink-400 mb-5">2026 벚꽃 개화 예측</p>
+        <p className="text-sm text-pink-400 mb-5">{new Date().getFullYear()} {t.blossomForecast}</p>
 
         <div className="grid grid-cols-2 gap-3">
           {cities.map((city) => {

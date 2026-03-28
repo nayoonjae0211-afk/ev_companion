@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LocaleContext } from '@/lib/locale-context';
 import { CityContext } from '@/lib/city-context';
+import { STORAGE_KEYS } from '@/lib/constants';
 import type { City } from '@/lib/types';
 import type { Locale } from '@/lib/i18n';
 import CitySelector from '@/components/ui/CitySelector';
@@ -11,6 +12,24 @@ import Navigation from '@/components/ui/Navigation';
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<Locale>('ko');
   const [selectedCity, setSelectedCity] = useState<City | null>(null);
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem(STORAGE_KEYS.locale) as Locale | null;
+    if (savedLocale === 'ko' || savedLocale === 'en') setLocale(savedLocale);
+
+    const savedCity = localStorage.getItem(STORAGE_KEYS.city);
+    if (savedCity) {
+      try { setSelectedCity(JSON.parse(savedCity)); } catch { /* ignore corrupt data */ }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.locale, locale);
+  }, [locale]);
+
+  useEffect(() => {
+    if (selectedCity) localStorage.setItem(STORAGE_KEYS.city, JSON.stringify(selectedCity));
+  }, [selectedCity]);
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale }}>
