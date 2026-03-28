@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   });
 
   // encodeURIComponent handles decoded key (plain text from 공공데이터포털)
-  const url = `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${encodeURIComponent(apiKey)}&${params}`;
+  const url = `https://apis.data.go.kr/B551011/KorService2/searchKeyword1?serviceKey=${encodeURIComponent(apiKey)}&${params}`;
 
   try {
     const res = await fetch(url, { cache: 'no-store' });
