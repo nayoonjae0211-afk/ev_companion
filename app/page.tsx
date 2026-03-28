@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useCity } from '@/lib/city-context';
 import { useLocale } from '@/lib/locale-context';
 import { strings } from '@/lib/i18n';
+import { weatherBackground } from '@/lib/weather-utils';
 import type { WeatherData } from '@/lib/types';
 import WeatherHero from '@/components/weather/WeatherHero';
 import WeatherStats from '@/components/weather/WeatherStats';
@@ -131,8 +132,13 @@ export default function WeatherPage() {
 
   if (!weather) return null;
 
+  const bg = weatherBackground(weather.conditionCode);
+
   return (
-    <div className="flex flex-col gap-4 pt-2 animate-fade-in">
+    <div
+      className="flex flex-col gap-4 pt-2 animate-fade-in -mx-4 px-4 min-h-screen"
+      style={{ background: bg }}
+    >
       <div className="flex justify-end">
         <button
           onClick={fetchWeather}

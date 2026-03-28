@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
   }
 
   const params = new URLSearchParams({
-    serviceKey: apiKey,
     numOfRows: '10',
     pageNo: '1',
     MobileOS: 'ETC',
@@ -21,7 +20,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?${params}`,
+      `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${apiKey}&${params}`,
       { next: { revalidate: 3600 } },
     );
     const data = await res.json();

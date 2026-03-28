@@ -11,10 +11,10 @@ import SpotSheet from '@/components/blossom/SpotSheet';
 const PetalCanvas = dynamic(() => import('@/components/blossom/PetalCanvas'), { ssr: false });
 
 const STATUS_STYLE: Record<string, { badge: string; ring: string }> = {
-  beforeBloom: { badge: 'bg-zinc-700/60 text-zinc-300', ring: 'ring-zinc-700/40' },
-  blooming:    { badge: 'bg-pink-500/20 text-pink-300', ring: 'ring-pink-500/30' },
-  peaking:     { badge: 'bg-pink-400/30 text-pink-200', ring: 'ring-pink-400/40' },
-  ended:       { badge: 'bg-zinc-800/60 text-zinc-500', ring: 'ring-zinc-700/20' },
+  beforeBloom: { badge: 'bg-pink-100 text-pink-600',   ring: 'ring-pink-200' },
+  blooming:    { badge: 'bg-pink-200 text-pink-700',   ring: 'ring-pink-300' },
+  peaking:     { badge: 'bg-pink-300 text-pink-800',   ring: 'ring-pink-400' },
+  ended:       { badge: 'bg-zinc-200 text-zinc-500',   ring: 'ring-zinc-300' },
 };
 
 export default function BlossomPage() {
@@ -48,12 +48,15 @@ export default function BlossomPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div
+      className="relative min-h-screen -mx-4 px-4"
+      style={{ background: 'linear-gradient(180deg, #fce7f3 0%, #fdf2f8 50%, #fff5fb 100%)' }}
+    >
       <PetalCanvas />
 
       <div className="relative z-10 pt-4 pb-8">
-        <h1 className="text-xl font-bold text-white mb-1">{t.blossomForecast}</h1>
-        <p className="text-sm text-zinc-500 mb-5">2026 벚꽃 개화 예측</p>
+        <h1 className="text-xl font-bold text-zinc-800 mb-1">{t.blossomForecast}</h1>
+        <p className="text-sm text-pink-400 mb-5">2026 벚꽃 개화 예측</p>
 
         <div className="grid grid-cols-2 gap-3">
           {cities.map((city) => {
@@ -70,7 +73,7 @@ export default function BlossomPage() {
               <button
                 key={city.id}
                 onClick={() => setSelected(city)}
-                className={`glass rounded-2xl p-4 text-left ring-1 ${style.ring} hover:bg-white/[0.06] transition-all active:scale-95`}
+                className={`bg-white/70 backdrop-blur-sm rounded-2xl p-4 text-left ring-1 ${style.ring} hover:bg-white/90 transition-all active:scale-95 shadow-sm`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-2xl">🌸</span>
@@ -78,7 +81,7 @@ export default function BlossomPage() {
                     {statusLabel(city)}
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-white">{name}</p>
+                <p className="text-sm font-semibold text-zinc-800">{name}</p>
                 <p className="text-xs text-zinc-500 mt-0.5">{date}</p>
               </button>
             );
