@@ -72,6 +72,8 @@ export default function WeatherPage() {
         }));
 
       const today = forecastDays[0]?.day;
+      const conditionCode = current.condition.code;
+      localStorage.setItem('lastConditionCode', String(conditionCode));
       setWeather({
         cityName: selectedCity.name_ko,
         tempC: current.temp_c,
@@ -81,7 +83,7 @@ export default function WeatherPage() {
         description: current.condition.text,
         humidity: current.humidity,
         windKph: current.wind_kph,
-        conditionCode: current.condition.code,
+        conditionCode,
         hourly: hourlyList,
         forecast,
       });
