@@ -56,18 +56,19 @@ export default function BlossomPage() {
           {cities.map((city) => {
             const style = STATUS_STYLE[city.status];
             const name = locale === 'ko' ? city.name_ko : city.name_en;
-            const date = city.bloom_date
-              ? new Date(city.bloom_date).toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })
-              : '';
+            const fmt = (d: string) =>
+              new Date(d).toLocaleDateString(locale === 'ko' ? 'ko-KR' : 'en-US', {
+                month: 'short',
+                day: 'numeric',
+              });
+            const bloomLabel = locale === 'ko' ? '개화' : 'Bloom';
+            const peakLabel  = locale === 'ko' ? '만개' : 'Peak';
 
             return (
               <button
                 key={city.id}
                 onClick={() => setSelected(city)}
-                className={`bg-white/70 backdrop-blur-sm rounded-2xl p-4 text-left ring-1 ${style.ring} hover:bg-white/90 transition-all active:scale-95 shadow-sm`}
+                className={`bg-white/70 backdrop-blur-sm rounded-2xl p-4 text-left ring-2 ${style.ring} hover:bg-white/90 transition-all active:scale-95 shadow-sm`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <span className="text-2xl">🌸</span>
@@ -76,7 +77,12 @@ export default function BlossomPage() {
                   </span>
                 </div>
                 <p className="text-sm font-semibold text-zinc-800">{name}</p>
-                <p className="text-xs text-zinc-500 mt-0.5">{date}</p>
+                <p className="text-[11px] text-zinc-500 mt-1">
+                  {bloomLabel} {city.bloom_date ? fmt(city.bloom_date) : '-'}
+                </p>
+                <p className="text-[11px] text-zinc-400">
+                  {peakLabel} {city.peak_date ? fmt(city.peak_date) : '-'}
+                </p>
               </button>
             );
           })}
