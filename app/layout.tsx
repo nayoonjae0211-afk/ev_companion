@@ -2,8 +2,8 @@ import './globals.css';
 import Providers from '@/components/Providers';
 
 export const metadata = {
-  title: '벚꽃 날씨',
-  description: '한국 벚꽃 개화 예보와 날씨',
+  title: 'Blossom Weather',
+  description: 'Korean cherry blossom forecast & weather',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
