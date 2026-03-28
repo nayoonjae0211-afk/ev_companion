@@ -18,7 +18,7 @@ export default function DailyForecast({ forecast, t, locale }: Props) {
 
   return (
     <div className="glass rounded-2xl overflow-hidden">
-      <p className="text-xs text-zinc-500 font-medium tracking-wider uppercase px-4 pt-4 pb-2">
+      <p className="text-xs text-white/70 font-medium tracking-wider uppercase px-4 pt-4 pb-2">
         {t.dailyForecast}
       </p>
       <div className="divide-y divide-white/[0.06]">
@@ -40,9 +40,9 @@ export default function DailyForecast({ forecast, t, locale }: Props) {
 
           return (
             <div key={day.date} className="flex items-center gap-3 px-4 py-3">
-              <span className="w-10 text-sm text-zinc-400">{label}</span>
+              <span className="w-10 text-sm text-white/90">{label}</span>
               <span className="text-xl w-7">{conditionEmoji(day.conditionCode)}</span>
-              <span className="w-8 text-right text-sm text-zinc-500">
+              <span className="w-8 text-right text-sm text-white/70">
                 {Math.round(day.tempMinC)}°
               </span>
               <div className="flex-1 relative h-1.5 bg-white/10 rounded-full overflow-hidden">

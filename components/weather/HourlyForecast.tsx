@@ -14,13 +14,13 @@ export default function HourlyForecast({ hourly, t }: Props) {
 
   return (
     <div className="glass rounded-2xl p-4">
-      <p className="text-xs text-zinc-500 font-medium tracking-wider uppercase mb-3">
+      <p className="text-xs text-white/70 font-medium tracking-wider uppercase mb-3">
         {t.hourlyForecast}
       </p>
       <div className="flex justify-between">
         {hourly.map((h, i) => (
           <div key={i} className="flex flex-col items-center gap-1.5">
-            <span className="text-xs text-zinc-500">{h.label}</span>
+            <span className="text-xs text-white/70">{h.label}</span>
             <span className="text-xl">{conditionEmoji(h.conditionCode)}</span>
             <span className="text-sm font-medium text-white">{Math.round(h.tempC)}°</span>
           </div>

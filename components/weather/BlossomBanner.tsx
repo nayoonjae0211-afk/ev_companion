@@ -48,7 +48,7 @@ export default function BlossomBanner({ city, t }: Props) {
         <span className="text-2xl">🌸</span>
         <div>
           <p className="text-sm font-semibold text-white">{t.blossomForecast}</p>
-          <p className="text-xs text-zinc-400 mt-0.5">{config.label}</p>
+          <p className="text-xs text-white/80 mt-0.5">{config.label}</p>
         </div>
       </div>
     </div>
