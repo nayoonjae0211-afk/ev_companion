@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   }
 
   const params = new URLSearchParams({
-    numOfRows: '10',
+    numOfRows: '20',
     pageNo: '1',
     MobileOS: 'ETC',
     MobileApp: 'EVCompanion',
@@ -18,12 +18,23 @@ export async function GET(req: NextRequest) {
     keyword: '벚꽃',
   });
 
+  // encodeURIComponent handles decoded key (plain text from 공공데이터포털)
+  const url = `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${encodeURIComponent(apiKey)}&${params}`;
+
   try {
-    const res = await fetch(
-      `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${apiKey}&${params}`,
-      { next: { revalidate: 3600 } },
-    );
+    const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
+
+    // API error check
+    const header = data?.response?.header ?? data?.response?.body;
+    const resultCode = data?.response?.header?.resultCode;
+    if (resultCode && resultCode !== '0000') {
+      return NextResponse.json(
+        { error: data?.response?.header?.resultMsg ?? 'API error', resultCode },
+        { status: 502 },
+      );
+    }
+
     return NextResponse.json(data);
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Unknown error';

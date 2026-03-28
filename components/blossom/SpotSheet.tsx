@@ -21,7 +21,10 @@ export default function SpotSheet({ city, t, locale, onClose }: Props) {
     fetch(`/api/blossom?areaCode=${city.area_code}`)
       .then((r) => r.json())
       .then((data) => {
-        const items = data?.response?.body?.items?.item ?? [];
+        if (data?.error) { setSpots([]); return; }
+        const raw = data?.response?.body?.items;
+        if (!raw || raw === '') { setSpots([]); return; }
+        const items = raw?.item ?? [];
         const list = (Array.isArray(items) ? items : [items]).map(
           (item: Record<string, unknown>) => ({
             title: (item.title as string) ?? '',
