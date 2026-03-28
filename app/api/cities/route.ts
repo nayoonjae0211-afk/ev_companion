@@ -15,20 +15,20 @@ const FALLBACK_CITIES = [
 ];
 
 export async function GET() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  );
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return NextResponse.json(FALLBACK_CITIES);
 
-  const { data, error } = await supabase
-    .from('cities')
-    .select('*')
-    .order('bloom_date', { ascending: true });
+    const supabase = createClient(url, key);
+    const { data, error } = await supabase
+      .from('cities')
+      .select('*')
+      .order('bloom_date', { ascending: true });
 
-  if (error || !data?.length) {
-    // Supabase 미설정 시 기본 도시 목록 반환
+    if (error || !data?.length) return NextResponse.json(FALLBACK_CITIES);
+    return NextResponse.json(data);
+  } catch {
     return NextResponse.json(FALLBACK_CITIES);
   }
-
-  return NextResponse.json(data);
 }
