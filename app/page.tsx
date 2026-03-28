@@ -160,7 +160,7 @@ export default function WeatherPage() {
 
       <WeatherStats weather={weather} t={t} />
       <HourlyForecast hourly={weather.hourly} t={t} />
-      <DailyForecast forecast={weather.forecast} t={t} locale={locale} />
+      <DailyForecast forecast={weather.forecast} t={t} />
     </div>
   );
 }

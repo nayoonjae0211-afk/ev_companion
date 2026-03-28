@@ -3,24 +3,24 @@
 import { useMemo } from 'react';
 import { conditionEmoji } from '@/lib/weather-utils';
 import type { ForecastDay } from '@/lib/types';
-import type { Strings, Locale } from '@/lib/i18n';
+import type { Strings } from '@/lib/i18n';
 
 interface Props {
   forecast: ForecastDay[];
   t: Strings;
-  locale: Locale;
 }
 
 const DAY_KEYS: Array<keyof Strings> = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-export default function DailyForecast({ forecast, t, locale: _locale }: Props) {
-  if (!forecast.length) return null;
-
-  const { maxAll, minAll, range } = useMemo(() => {
+export default function DailyForecast({ forecast, t }: Props) {
+  const { minAll, range } = useMemo(() => {
+    if (!forecast.length) return { minAll: 0, range: 1 };
     const maxAll = Math.max(...forecast.map((d) => d.tempMaxC));
     const minAll = Math.min(...forecast.map((d) => d.tempMinC));
-    return { maxAll, minAll, range: maxAll - minAll || 1 };
+    return { minAll, range: maxAll - minAll || 1 };
   }, [forecast]);
+
+  if (!forecast.length) return null;
 
   return (
     <div className="glass rounded-2xl overflow-hidden">

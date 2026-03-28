@@ -23,6 +23,7 @@ export default function CitySelector() {
         }
       })
       .catch((err) => console.error('Failed to fetch cities:', err));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

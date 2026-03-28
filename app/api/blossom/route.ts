@@ -26,7 +26,6 @@ export async function GET(req: NextRequest) {
     const data = await res.json();
 
     // API error check
-    const header = data?.response?.header ?? data?.response?.body;
     const resultCode = data?.response?.header?.resultCode;
     if (resultCode && resultCode !== '0000') {
       return NextResponse.json(
