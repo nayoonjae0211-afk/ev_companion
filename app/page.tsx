@@ -120,6 +120,15 @@ export default function WeatherPage() {
     );
   }
 
+  if (!weather && !selectedCity) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-3">
+        <p className="text-4xl">🌸</p>
+        <p className="text-zinc-400 text-sm">{t.selectCity}</p>
+      </div>
+    );
+  }
+
   if (!weather) return null;
 
   return (
